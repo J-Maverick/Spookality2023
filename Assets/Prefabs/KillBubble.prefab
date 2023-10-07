@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8900942570280039165}
-  - component: {fileID: 6837015872177643268}
+  - component: {fileID: 3902315857885334442}
   - component: {fileID: 9156600191178683417}
   - component: {fileID: 6946727407318248434}
   - component: {fileID: 7020467077996814292}
@@ -36,8 +36,8 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &6837015872177643268
-CapsuleCollider:
+--- !u!65 &3902315857885334442
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -46,9 +46,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 0
-  m_Radius: 0.2
-  m_Height: 0.75
-  m_Direction: 1
+  serializedVersion: 2
+  m_Size: {x: 0.4, y: 0.75, z: 0.4}
   m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!114 &9156600191178683417
 MonoBehaviour:
@@ -76,10 +75,11 @@ MonoBehaviour:
       Data: 
   _udonSharpBackingUdonBehaviour: {fileID: 6946727407318248434}
   bubbleActive: 0
-  bubbleCollider: {fileID: 6837015872177643268}
+  bubbleCollider: {fileID: 3902315857885334442}
   gBJLocation: {fileID: 0}
   soundFX: {fileID: 6392619050704959223}
   bubblePool: {fileID: 0}
+  interactProximity: 5
 --- !u!114 &6946727407318248434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
   interactTextPlacement: {fileID: 0}
   interactText: Capture
   interactTextGO: {fileID: 0}
-  proximity: 2
+  proximity: 100
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0

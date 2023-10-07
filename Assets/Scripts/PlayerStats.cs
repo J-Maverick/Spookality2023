@@ -15,6 +15,14 @@ public class PlayerStats : UdonSharpBehaviour
     public bool sizeModEnabled = true;
     public float sizeModifier = 1f;
     public float defaultSize = 1.84f;
+
+    public float bigWalkSpeed = 3.33f;
+    public float bigRunSpeed = 6.66f;
+    public float bigStrafeSpeed = 3.33f;
+
+    public float smallWalkSpeed = 1.1f;
+    public float smallRunSpeed = 2.2f;
+    public float smallStrafeSpeed = 1.1f;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
@@ -32,12 +40,34 @@ public class PlayerStats : UdonSharpBehaviour
     public void SetSizeModifier() {
         if (sizeModEnabled) {
             sizeModifier = localPlayer.GetAvatarEyeHeightAsMeters() / defaultSize;
+            if (sizeModifier >= 0.9f) {
+                SetBigSpeed();
+            }
+            else {
+                SetSmallSpeed();
+            }
         }
         else {
             sizeModifier = 1f;
+            SetMoveSpeed();
         }
-        SetMoveSpeed();
         SetJumpImpulse();
+    }
+
+    
+    public void SetBigSpeed()
+    {
+        localPlayer.SetRunSpeed(bigRunSpeed);
+        localPlayer.SetWalkSpeed(bigWalkSpeed);
+        localPlayer.SetStrafeSpeed(bigStrafeSpeed);
+        Debug.LogFormat("{0}: Local Player Stats: RunSpeed: {1} | WalkSpeed: {2} | StrafeSpeed: {3}", name, localPlayer.GetRunSpeed(), localPlayer.GetWalkSpeed(), localPlayer.GetStrafeSpeed());
+    }
+    public void SetSmallSpeed()
+    {
+        localPlayer.SetRunSpeed(smallRunSpeed);
+        localPlayer.SetWalkSpeed(smallWalkSpeed);
+        localPlayer.SetStrafeSpeed(smallStrafeSpeed);
+        Debug.LogFormat("{0}: Local Player Stats: RunSpeed: {1} | WalkSpeed: {2} | StrafeSpeed: {3}", name, localPlayer.GetRunSpeed(), localPlayer.GetWalkSpeed(), localPlayer.GetStrafeSpeed());
     }
 
     public void SetMoveSpeed()
@@ -45,6 +75,7 @@ public class PlayerStats : UdonSharpBehaviour
         localPlayer.SetRunSpeed(defaultRunSpeed * sizeModifier);
         localPlayer.SetWalkSpeed(defaultWalkSpeed * sizeModifier);
         localPlayer.SetStrafeSpeed(defaultStrafeSpeed * sizeModifier);
+        Debug.LogFormat("{0}: Local Player Stats: RunSpeed: {1} | WalkSpeed: {2} | StrafeSpeed: {3}", name, localPlayer.GetRunSpeed(), localPlayer.GetWalkSpeed(), localPlayer.GetStrafeSpeed());
     }
 
     public void SetJumpImpulse()

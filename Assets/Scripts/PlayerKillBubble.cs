@@ -12,6 +12,8 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public Transform gBJLocation = null;
     public PlayRandomSound soundFX = null;
     public BubblePool bubblePool = null;
+    public float interactProximity = 5f;
+    public GateManager gateManager;
 
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -43,12 +45,21 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public override void Interact()
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "PlayCapture");
+        gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
         PlayCaptureSound();
     }
 
     void Update() {
         if (_usingPlayer != null) {
             transform.position = _usingPlayer.GetPosition();
+            if (bubbleActive && Networking.LocalPlayer.isMaster) {
+                if (Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
+                    bubbleCollider.enabled = true;
+                }
+                else {
+                    bubbleCollider.enabled = false;
+                }
+            }
         }
         else {
             _usingPlayer = Networking.GetOwner(gameObject);

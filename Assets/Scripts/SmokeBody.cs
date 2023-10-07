@@ -7,14 +7,22 @@ using VRC.Udon;
 public class SmokeBody : UdonSharpBehaviour
 {
     public GameObject particles = null;
+    [UdonSynced] public bool active = false;
 
     void Update()
     {
-        if (Networking.LocalPlayer.isMaster) {
-            particles.SetActive(false);
+        if (active) {
+            if (Networking.LocalPlayer.isMaster) {
+                particles.SetActive(false);
+            }
+            else {
+                particles.SetActive(true);
+                transform.position = Networking.GetOwner(gameObject).GetPosition();
+            }
         }
         else {
-            transform.position = Networking.GetOwner(gameObject).GetPosition();
+            transform.position = Vector3.zero;
+            particles.SetActive(false);
         }
     } 
             
