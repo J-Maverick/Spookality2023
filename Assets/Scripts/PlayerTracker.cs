@@ -14,6 +14,8 @@ public class PlayerTracker : UdonSharpBehaviour
     }
 
     public void Update() {
-        transform.SetPositionAndRotation(localPlayer.GetPosition(), localPlayer.GetRotation());
+        if (localPlayer.IsValid()) {
+            transform.SetPositionAndRotation(localPlayer.GetPosition(), localPlayer.GetRotation());
+        }
     }
 }

@@ -13,13 +13,14 @@ public class GateToggle : UdonSharpBehaviour
     public float openRate = 0.00001f;
     public float openRateMultiplier = 1.1f;
     public float closeRate = 2f;
-    float _openRate = 0f;
+    public float _openRate = 0f;
     public GameManager gameManager;
     public GateManager gateManager;
     public AudioSource openSound;
     public AudioSource closeSound;
     public Quaternion openRotation = Quaternion.Euler(90f, 0f, 0f);
     public Quaternion closeRotation = Quaternion.identity;
+    public Collider selectionCollider;
 
     public override void Interact()
     {
@@ -27,7 +28,7 @@ public class GateToggle : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Open");
         }
         else if (gameManager.localPlayerType == LocalPlayerType.HUNTER) { 
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Close");
+            gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
         }
     }
     public void Open()
@@ -44,18 +45,33 @@ public class GateToggle : UdonSharpBehaviour
         openSound.Stop();
         if (open) {
             closeSound.Play();
+            gateManager.ResetTimer();
         }
         _openRate = openRate;
         open = false;
         fullyOpen = false;
-        gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
     }
 
-    void FixedUpdate() {
+    public void Update() {
+        if (gameManager.gameInProgress) {
+            if (gameManager.localPlayerType == LocalPlayerType.INNOCENT_FREE && gateManager.CanOpenNew()) { 
+                selectionCollider.enabled = true;
+            }
+            else if (gameManager.localPlayerType == LocalPlayerType.HUNTER && open) { 
+                selectionCollider.enabled = true;
+            }
+            else {
+                selectionCollider.enabled = false;
+            }
+        }
+    }
+
+    public void FixedUpdate() {
         if (open) {
             if (!fullyOpen) {
-                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, openRotation, _openRate);
-                _openRate *= openRateMultiplier;
+                Debug.LogFormat("{0}: FixedUpdate: opening", name);
+                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, openRotation, _openRate * Time.fixedDeltaTime);
+                _openRate += _openRate * openRateMultiplier * Time.fixedDeltaTime;
                 if (transform.localRotation == openRotation) {
                     fullyOpen = true;
                 }
@@ -63,7 +79,8 @@ public class GateToggle : UdonSharpBehaviour
         }
         else {
             if (!fullyClosed) {
-                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, closeRotation, closeRate);
+                Debug.LogFormat("{0}: FixedUpdate: closing", name);
+                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, closeRotation, closeRate * Time.fixedDeltaTime);
                 if (transform.localRotation == closeRotation) {
                     fullyClosed = true;
                 }

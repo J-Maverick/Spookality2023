@@ -12,7 +12,7 @@ public class SmokeBody : UdonSharpBehaviour
     void Update()
     {
         if (active) {
-            if (Networking.LocalPlayer.isMaster) {
+            if (Networking.GetOwner(gameObject).isLocal) {
                 particles.SetActive(false);
             }
             else {

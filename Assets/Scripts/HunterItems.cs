@@ -20,11 +20,9 @@ public class HunterItems : UdonSharpBehaviour
 
     public void ActivateItems() {
         Debug.LogFormat("{0}: Attempting to activate", name);
-        if (hunterAssigned) { 
-            headLight.active = true;
-            smokeBody.active = true;
-            Debug.LogFormat("{0}: Activated", name);  
-        }
+        headLight.active = true;
+        smokeBody.active = true;
+        Debug.LogFormat("{0}: Activated", name);  
     }
 
     public void DeactivateItems() {

@@ -14,6 +14,7 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public BubblePool bubblePool = null;
     public float interactProximity = 5f;
     public GateManager gateManager;
+    public GameManager gameManager;
 
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -31,29 +32,35 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public void Activate() {
         _usingPlayer = Networking.GetOwner(gameObject);
         bubbleActive = true;
-        if (!_usingPlayer.isLocal) {
+        if (gameManager.localPlayerType == LocalPlayerType.HUNTER) {
             bubbleCollider.enabled = true;
         }
-        Debug.LogFormat("{0}: Initialized... _usingPlayer: {1}[{2}]", name, _usingPlayer.displayName, _usingPlayer.playerId);
+        else {
+            bubbleCollider.enabled = false;
+        }
+        Debug.LogFormat("{0}: Initialized | _usingPlayer: {1}[{2}] | localPlayerType: {3} | Collider: {4}", name, _usingPlayer.displayName, _usingPlayer.playerId, gameManager.localPlayerType.ToString(), bubbleCollider.enabled);
     }
 
     public void Deactivate() {
         bubbleActive = false;
         bubbleCollider.enabled = false;
+        Debug.LogFormat("{0}: Deactivated.", name);
     }
 
     public override void Interact()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "PlayCapture");
-        gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
-        PlayCaptureSound();
+        if (gameManager.localPlayerType == LocalPlayerType.HUNTER && !gateManager.containedPlayers.Contains(Networking.GetOwner(gameObject).playerId)) {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "PlayCapture");
+            gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
+            PlayCaptureSound();
+        }
     }
 
     void Update() {
         if (_usingPlayer != null) {
             transform.position = _usingPlayer.GetPosition();
-            if (bubbleActive && Networking.LocalPlayer.isMaster) {
-                if (Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
+            if (bubbleActive && gameManager.localPlayerType == LocalPlayerType.HUNTER) {
+                if (!gateManager.containedPlayers.Contains(Networking.GetOwner(gameObject).playerId) && Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
                     bubbleCollider.enabled = true;
                 }
                 else {

@@ -14,7 +14,7 @@ public class EggOnFoot : UdonSharpBehaviour
 
     void Update()
     {
-        if (localPlayer != null) {
+        if (localPlayer.IsValid()) {
             transform.position = localPlayer.GetPosition();
         }
     } 

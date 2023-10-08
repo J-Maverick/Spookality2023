@@ -23,36 +23,39 @@ public class PlayerStats : UdonSharpBehaviour
     public float smallWalkSpeed = 1.1f;
     public float smallRunSpeed = 2.2f;
     public float smallStrafeSpeed = 1.1f;
+    
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
-        SetSizeModifier();
-    }
-
-
-    public override void OnAvatarEyeHeightChanged(VRCPlayerApi player, float prevEyeHeightAsMeters)
-    {
-        if (player.isLocal) {
-            SetSizeModifier();
-        }
-    }
-
-    public void SetSizeModifier() {
-        if (sizeModEnabled) {
-            sizeModifier = localPlayer.GetAvatarEyeHeightAsMeters() / defaultSize;
-            if (sizeModifier >= 0.9f) {
-                SetBigSpeed();
-            }
-            else {
-                SetSmallSpeed();
-            }
-        }
-        else {
-            sizeModifier = 1f;
-            SetMoveSpeed();
-        }
+        SetDefaultSpeed();
         SetJumpImpulse();
+        // SetSizeModifier();
     }
+
+
+    // public override void OnAvatarEyeHeightChanged(VRCPlayerApi player, float prevEyeHeightAsMeters)
+    // {
+    //     if (player.isLocal) {
+    //         SetSizeModifier();
+    //     }
+    // }
+
+    // public void SetSizeModifier() {
+    //     if (sizeModEnabled) {
+    //         sizeModifier = localPlayer.GetAvatarEyeHeightAsMeters() / defaultSize;
+    //         if (sizeModifier >= 0.9f) {
+    //             SetBigSpeed();
+    //         }
+    //         else {
+    //             SetSmallSpeed();
+    //         }
+    //     }
+    //     else {
+    //         sizeModifier = 1f;
+    //         SetMoveSpeed();
+    //     }
+    //     SetJumpImpulse();
+    // }
 
     
     public void SetBigSpeed()
@@ -70,11 +73,11 @@ public class PlayerStats : UdonSharpBehaviour
         Debug.LogFormat("{0}: Local Player Stats: RunSpeed: {1} | WalkSpeed: {2} | StrafeSpeed: {3}", name, localPlayer.GetRunSpeed(), localPlayer.GetWalkSpeed(), localPlayer.GetStrafeSpeed());
     }
 
-    public void SetMoveSpeed()
+    public void SetDefaultSpeed()
     {
-        localPlayer.SetRunSpeed(defaultRunSpeed * sizeModifier);
-        localPlayer.SetWalkSpeed(defaultWalkSpeed * sizeModifier);
-        localPlayer.SetStrafeSpeed(defaultStrafeSpeed * sizeModifier);
+        localPlayer.SetRunSpeed(defaultRunSpeed);
+        localPlayer.SetWalkSpeed(defaultWalkSpeed);
+        localPlayer.SetStrafeSpeed(defaultStrafeSpeed);
         Debug.LogFormat("{0}: Local Player Stats: RunSpeed: {1} | WalkSpeed: {2} | StrafeSpeed: {3}", name, localPlayer.GetRunSpeed(), localPlayer.GetWalkSpeed(), localPlayer.GetStrafeSpeed());
     }
 

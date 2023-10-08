@@ -11,6 +11,7 @@ public class GateManager : UdonSharpBehaviour
     public GateToggle[] gates;
     public GameManager gameManager;
     public DataList containedPlayers = new DataList(){};
+    public float timer = 0f;
 
     public void ShutAllGates() {
         foreach (GateToggle gate in gates) {
@@ -20,6 +21,9 @@ public class GateManager : UdonSharpBehaviour
 
     public bool CanOpenNew()
     {
+        if (timer > 0f) {
+            return false;
+        }
         foreach (GateToggle gate in gates) {
             if (gate.open) {
                 return false;
@@ -39,7 +43,7 @@ public class GateManager : UdonSharpBehaviour
 
     public override void OnPlayerTriggerStay(VRCPlayerApi player)
     {
-        if (player.isLocal) {
+        if (player.isLocal && gameManager.localPlayerType != LocalPlayerType.HUNTER) {
             gameManager.localPlayerType = LocalPlayerType.INNOCENT_CAPTURED;
         }
         if (!containedPlayers.Contains(player.playerId)) {
@@ -49,31 +53,49 @@ public class GateManager : UdonSharpBehaviour
 
     public override void OnPlayerTriggerExit(VRCPlayerApi player)
     {
-        if (player.isLocal) {
-            gameManager.localPlayerType = LocalPlayerType.INNOCENT_FREE;
+        if (!AllGatesClosed()) {
+            if (player.isLocal && gameManager.localPlayerType == LocalPlayerType.INNOCENT_CAPTURED) {
+                gameManager.localPlayerType = LocalPlayerType.INNOCENT_FREE;
+            }
+            if (containedPlayers.Contains(player.playerId)) {
+                containedPlayers.Remove(player.playerId);
+            }
         }
-        if (containedPlayers.Contains(player.playerId)) {
-            containedPlayers.Remove(player.playerId);
+        else if (gameManager.gameInProgress) {
+            if (player.isLocal && gameManager.localPlayerType == LocalPlayerType.INNOCENT_CAPTURED) {
+                player.TeleportTo(transform.position, transform.rotation);
+            }
         }
     }
 
     public bool CheckVictory() {
-        for (int i=0; i < gameManager.players.Count; i++) {
+        if (AllGatesClosed()) {
+            for (int i=0; i < gameManager.players.Count; i++) {
 
-            if (gameManager.hunters.Contains(gameManager.players[i])) continue;
+                if (gameManager.hunters.Contains(gameManager.players[i])) continue;
 
-            if (VRCPlayerApi.GetPlayerById(gameManager.players[i].Int).IsValid()) {
-                if (!containedPlayers.Contains(gameManager.players[i])) {
-                    return false;
+                if (VRCPlayerApi.GetPlayerById(gameManager.players[i].Int) != null) {
+                    if (!containedPlayers.Contains(gameManager.players[i])) {
+                        return false;
+                    }
                 }
             }
+            Debug.LogFormat("{0}: Victory condition reached! n contained players: {1}", name, containedPlayers.Count);
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    public void ResetTimer() {
+        timer = gameManager.gateCooldownTimeSecs;
     }
 
     void Update() {
-        // if (Networking.LocalPlayer.isMaster) {
-        //     gameManager.VictoryCondition(CheckVictory());
-        // }
+        if (gameManager.gameInProgress && Networking.LocalPlayer.isMaster) {
+            gameManager.VictoryCondition(CheckVictory());
+        }
+        if (timer > 0f) {
+            timer -= Time.deltaTime;
+        }
     }
 }
