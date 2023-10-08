@@ -9,7 +9,7 @@ public class Torch : UdonSharpBehaviour
 {
     public GameObject lightObject;
     public AudioSource lightClickSound;
-    public Material material;
+    // public Material material;
     public MeshRenderer meshRenderer;
     public Rigidbody rb;
     public Collider meshCollider;
@@ -17,17 +17,22 @@ public class Torch : UdonSharpBehaviour
     public Vector3 spawnLocation;
     public Quaternion spawnRotation;
     public VRCPickup pickup;
+    public GameManager gameManager;
+    // [ColorUsage(true, true)]
+    // public Color onEmission;
+    // [ColorUsage(true, true)]
+    // public Color offEmission;
+    public Animator animator;
+
 
     [UdonSynced, FieldChangeCallback(nameof(lightOn))]
-    private bool _lightOn = false;
-    public GameManager gameManager;
-
+    private bool _lightOn;
     public bool lightOn
     {
         set
         {
             _lightOn = value;
-            if (_lightOn) {
+            if (value) {
                 LightOn();
             }
             else {
@@ -38,18 +43,19 @@ public class Torch : UdonSharpBehaviour
     }
 
     [UdonSynced, FieldChangeCallback(nameof(isEnabled))]
-    private bool _isEnabled = false;
-
+    private bool _isEnabled;
     public bool isEnabled
     {
         set
         {
-            _isEnabled = value;
-            if (_isEnabled) {
-                Enable();
-            }
-            else {
-                Disable();
+            if (value != _isEnabled) {          
+                _isEnabled = value;
+                if (value) {
+                    Enable();
+                }
+                else {
+                    Disable();
+                }
             }
         }
         get => _isEnabled;
@@ -57,7 +63,7 @@ public class Torch : UdonSharpBehaviour
 
 
     public void Start() {
-        material = meshRenderer.material;
+        // material = meshRenderer.material;
         spawnLocation = transform.position;
         spawnRotation = transform.rotation;
         if (Networking.LocalPlayer.IsUserInVR()) {
@@ -69,28 +75,42 @@ public class Torch : UdonSharpBehaviour
         else {
             Disable();
         }
+        if (Networking.LocalPlayer.isMaster) {
+            Reset();
+        }
     }
 
-    [ContextMenu("Toggle Flashlight")]
     public override void OnPickupUseDown()
     {
+        ToggleFlashlight();
+    }
+
+    public void ToggleFlashlight() {
         lightOn = !lightOn;
     }
 
     public void Reset() {
-        material.DisableKeyword("_EMISSION");
+        // material.SetVector("_EmissionColor", offEmission);
+        // meshRenderer.material = material;
+        animator.SetBool("LightOn", false);
         lightObject.SetActive(false);
         transform.SetPositionAndRotation(spawnLocation, spawnRotation);
     }
 
     public void LightOn() {
-        material.EnableKeyword("_EMISSION");
+        Debug.LogFormat("{0}: Light On", name);
+        animator.SetBool("LightOn", true);
+        // material.SetVector("_EmissionColor", onEmission);
+        // meshRenderer.material = material;
         lightObject.SetActive(true);
         lightClickSound.Play();
     }
 
     public void LightOff() {
-        material.DisableKeyword("_EMISSION");
+        Debug.LogFormat("{0}: Light Off", name);
+        animator.SetBool("LightOn", false);
+        // material.SetVector("_EmissionColor", offEmission);
+        // meshRenderer.material = material;
         lightObject.SetActive(false);
         lightClickSound.Play();
     }

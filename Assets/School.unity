@@ -7607,8 +7607,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &136734006
-MeshCollider:
+--- !u!65 &136734006
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7617,10 +7617,9 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  serializedVersion: 2
+  m_Size: {x: 10, y: 0.2, z: 10}
+  m_Center: {x: 0, y: -0.1, z: 0}
 --- !u!23 &136734007
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -89123,13 +89122,13 @@ MonoBehaviour:
   useAssignedLayers: 0
   DynamicPrefabs: []
   DynamicMaterials:
-  - {fileID: 2100000, guid: 1bfd9ac79b486a94e9ec20c4ac891854, type: 2}
   - {fileID: 2100000, guid: 8fdfa0248f0916b4b8dc7081b347c03d, type: 2}
-  - {fileID: 2100000, guid: be12aedcfdb5e804bbedc5ac4f64eb5f, type: 2}
-  - {fileID: 2100000, guid: 3ab380d90e59c94439572dadda6567eb, type: 2}
+  - {fileID: 2100000, guid: 1bfd9ac79b486a94e9ec20c4ac891854, type: 2}
   - {fileID: 2100000, guid: 6631687a4d76d1449907b6e14c640948, type: 2}
   - {fileID: 2100000, guid: 7a218d038c269c04ba992bf7cd2a5721, type: 2}
   - {fileID: 2100000, guid: bc4aa141affab3d4688e384e9933005c, type: 2}
+  - {fileID: 2100000, guid: be12aedcfdb5e804bbedc5ac4f64eb5f, type: 2}
+  - {fileID: 2100000, guid: 3ab380d90e59c94439572dadda6567eb, type: 2}
   - {fileID: 2100000, guid: f469f2243bad6614591a3b5c9d67a7c0, type: 2}
   - {fileID: 2100000, guid: d6def63197ed833469aaa7dd03c7f504, type: 2}
   - {fileID: 2100000, guid: c507f5eea8b3e774a95fdb5c276d4c44, type: 2}
@@ -113260,7 +113259,7 @@ MonoBehaviour:
   gameInProgress: 0
   hidingPhase: 0
   gameLengthMin: 5
-  hidingTimeSecs: 5
+  hidingTimeSecs: 45
   gateCooldownTimeSecs: 15
   gameTime: 0
   hidingTime: 0
@@ -116828,6 +116827,26 @@ PrefabInstance:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 2065837862}
+    - target: {fileID: 6949065764987057115, guid: 309bdbe49c3bd374392a35ab68c23b77,
+        type: 3}
+      propertyPath: onEmission.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6949065764987057115, guid: 309bdbe49c3bd374392a35ab68c23b77,
+        type: 3}
+      propertyPath: onEmission.b
+      value: 8.474191
+      objectReference: {fileID: 0}
+    - target: {fileID: 6949065764987057115, guid: 309bdbe49c3bd374392a35ab68c23b77,
+        type: 3}
+      propertyPath: onEmission.g
+      value: 8.474191
+      objectReference: {fileID: 0}
+    - target: {fileID: 6949065764987057115, guid: 309bdbe49c3bd374392a35ab68c23b77,
+        type: 3}
+      propertyPath: onEmission.r
+      value: 8.474191
+      objectReference: {fileID: 0}
     - target: {fileID: 6949065764987057115, guid: 309bdbe49c3bd374392a35ab68c23b77,
         type: 3}
       propertyPath: serializationData.Prefab

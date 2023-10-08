@@ -59,12 +59,6 @@ public class GameManager : UdonSharpBehaviour
     public float playerStartHeight = 1.84f;
     public GameObject hunterKeepawayZone;
     public PlayerStats playerStats;
-    
-    public void Start() {
-        if (Networking.LocalPlayer.isMaster) {
-            ResetFlashlights();
-        }
-    }
 
     public override void OnPreSerialization()
     {
