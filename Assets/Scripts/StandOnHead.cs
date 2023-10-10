@@ -6,22 +6,35 @@ using VRC.Udon;
 
 public class StandOnHead : UdonSharpBehaviour
 {
-    BoxCollider boxCollider;
-    VRCPlayerApi localPlayer = null;
-    bool initialized = false;
+    public BoxCollider boxCollider;
+    public VRCPlayerApi localPlayer = null;
+    public bool logicActive = false;
 
     public void Start() {
         boxCollider = GetComponent<BoxCollider>();
         localPlayer = Networking.LocalPlayer;
-        initialized = true;
     }
-    public void Update()
+
+    public override void OnPlayerTriggerExit(VRCPlayerApi player)
     {
-        if (initialized && transform.position.y - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position.y > 0) {
-            boxCollider.enabled = false;
-        }
-        else {
-            boxCollider.enabled = true;
+        logicActive = false;
+        boxCollider.enabled = true;
+    }
+
+    public override void OnPlayerTriggerStay(VRCPlayerApi player)
+    {
+        logicActive = true;
+    }
+
+    public virtual void Update()
+    {
+        if (logicActive) {
+            if (transform.position.y - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position.y > 0) {
+                boxCollider.enabled = false;
+            }
+            else {
+                boxCollider.enabled = true;
+            }
         }
     }
 }

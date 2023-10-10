@@ -47,12 +47,12 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 0
+  Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 8
+  MaxDistance: 20
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0
@@ -62,40 +62,31 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.125
+      time: 0.025741577
       value: 1
-      inSlope: -8.0032
-      outSlope: -8.0032
+      inSlope: -0.28122336
+      outSlope: -0.28122336
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.528757
     - serializedVersion: 3
-      time: 0.25
-      value: 0.5
-      inSlope: -2.0008
-      outSlope: -2.0008
+      time: 0.4580071
+      value: 0.34174642
+      inSlope: -1.4415013
+      outSlope: -1.4415013
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.5
-      value: 0.25
-      inSlope: -0.5002
-      outSlope: -0.5002
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0.03375244
-      inSlope: -0.12505
-      outSlope: -0.12505
+      value: 0
+      inSlope: -0.09682046
+      outSlope: -0.09682046
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.24565564
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -161,7 +152,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6949065764802348959
 Transform:
   m_ObjectHideFlags: 0
@@ -188,10 +179,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
-  m_Range: 15
-  m_SpotAngle: 60
-  m_InnerSpotAngle: 6
+  m_Intensity: 3
+  m_Range: 30
+  m_SpotAngle: 50
+  m_InnerSpotAngle: 4
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2

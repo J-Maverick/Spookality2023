@@ -9,7 +9,6 @@ public class Torch : UdonSharpBehaviour
 {
     public GameObject lightObject;
     public AudioSource lightClickSound;
-    // public Material material;
     public MeshRenderer meshRenderer;
     public Rigidbody rb;
     public Collider meshCollider;
@@ -18,10 +17,6 @@ public class Torch : UdonSharpBehaviour
     public Quaternion spawnRotation;
     public VRCPickup pickup;
     public GameManager gameManager;
-    // [ColorUsage(true, true)]
-    // public Color onEmission;
-    // [ColorUsage(true, true)]
-    // public Color offEmission;
     public Animator animator;
 
 
@@ -63,7 +58,6 @@ public class Torch : UdonSharpBehaviour
 
 
     public void Start() {
-        // material = meshRenderer.material;
         spawnLocation = transform.position;
         spawnRotation = transform.rotation;
         if (Networking.LocalPlayer.IsUserInVR()) {
@@ -90,8 +84,6 @@ public class Torch : UdonSharpBehaviour
     }
 
     public void Reset() {
-        // material.SetVector("_EmissionColor", offEmission);
-        // meshRenderer.material = material;
         animator.SetBool("LightOn", false);
         lightObject.SetActive(false);
         transform.SetPositionAndRotation(spawnLocation, spawnRotation);
@@ -100,8 +92,6 @@ public class Torch : UdonSharpBehaviour
     public void LightOn() {
         Debug.LogFormat("{0}: Light On", name);
         animator.SetBool("LightOn", true);
-        // material.SetVector("_EmissionColor", onEmission);
-        // meshRenderer.material = material;
         lightObject.SetActive(true);
         lightClickSound.Play();
     }
@@ -109,8 +99,6 @@ public class Torch : UdonSharpBehaviour
     public void LightOff() {
         Debug.LogFormat("{0}: Light Off", name);
         animator.SetBool("LightOn", false);
-        // material.SetVector("_EmissionColor", offEmission);
-        // meshRenderer.material = material;
         lightObject.SetActive(false);
         lightClickSound.Play();
     }
