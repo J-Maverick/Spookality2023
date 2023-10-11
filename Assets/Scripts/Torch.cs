@@ -108,7 +108,14 @@ public class Torch : UdonSharpBehaviour
     public void LightOn() {
         Debug.LogFormat("{0}: Light On", name);
         animator.SetBool("LightOn", true);
-        lightObject.SetActive(true);
+        if (quest) {   
+            if (Networking.GetOwner(gameObject).isLocal) {
+                lightObject.SetActive(true);
+            }
+        }
+        else {
+            lightObject.SetActive(true);
+        }
         lightClickSound.Play();
     }
 
