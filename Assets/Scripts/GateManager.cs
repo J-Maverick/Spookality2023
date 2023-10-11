@@ -43,11 +43,20 @@ public class GateManager : UdonSharpBehaviour
 
     public override void OnPlayerTriggerStay(VRCPlayerApi player)
     {
-        if (player.isLocal && gameManager.localPlayerType != LocalPlayerType.HUNTER) {
-            gameManager.localPlayerType = LocalPlayerType.INNOCENT_CAPTURED;
+        if (gameManager.gameInProgress) {
+            if (AllGatesClosed()) {
+                if (player.isLocal && gameManager.localPlayerType != LocalPlayerType.HUNTER) {
+                    gameManager.localPlayerType = LocalPlayerType.INNOCENT_CAPTURED;
+                }
+                if (!containedPlayers.Contains(player.playerId)) {
+                    containedPlayers.Add(player.playerId);
+                }
+            }
         }
-        if (!containedPlayers.Contains(player.playerId)) {
-            containedPlayers.Add(player.playerId);
+        else {
+            if (player.isLocal) {
+                gameManager.SendPlayerHome();
+            }
         }
     }
 
@@ -91,8 +100,13 @@ public class GateManager : UdonSharpBehaviour
     }
 
     void Update() {
-        if (gameManager.gameInProgress && Networking.LocalPlayer.isMaster) {
-            gameManager.VictoryCondition(CheckVictory());
+        if (gameManager.gameInProgress) {
+            if (Networking.LocalPlayer.isMaster) {
+                gameManager.VictoryCondition(CheckVictory());
+            }
+            if (!AllGatesClosed() && containedPlayers.Count > 0) {
+                containedPlayers.Clear();
+            }
         }
         if (timer > 0f) {
             timer -= Time.deltaTime;

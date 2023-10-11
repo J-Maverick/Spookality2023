@@ -317,7 +317,9 @@ public class GameManager : UdonSharpBehaviour
 
     public void SendPlayerHome() {
         Debug.LogFormat("{0}: Returning player to spawn hub", name);
-        Networking.LocalPlayer.TeleportTo(gameRoomSpawn.transform.position, gameRoomSpawn.transform.rotation);
+        if (localPlayerType != LocalPlayerType.NON_PARTICIPANT) {
+            Networking.LocalPlayer.TeleportTo(gameRoomSpawn.transform.position, gameRoomSpawn.transform.rotation);
+        }
     }
 
     public void EndGame() {

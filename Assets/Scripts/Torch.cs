@@ -19,6 +19,8 @@ public class Torch : UdonSharpBehaviour
     public GameManager gameManager;
     public Animator animator;
 
+    public bool quest = false;
+
 
     [UdonSynced, FieldChangeCallback(nameof(lightOn))]
     private bool _lightOn;
@@ -77,6 +79,20 @@ public class Torch : UdonSharpBehaviour
     public override void OnPickupUseDown()
     {
         ToggleFlashlight();
+    }
+
+    public override void OnPickup()
+    {
+        if (quest && lightOn) {
+            lightObject.SetActive(true);
+        }
+    }
+
+    public override void OnDrop()
+    {
+        if (quest) {
+            lightObject.SetActive(false);
+        }
     }
 
     public void ToggleFlashlight() {
