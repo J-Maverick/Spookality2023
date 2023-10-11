@@ -115,6 +115,8 @@ public class Torch : UdonSharpBehaviour
     public void Disable() {
         meshRenderer.enabled = false;
         rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         meshCollider.enabled = false;
         isEnabled = false;
         pickup.Drop();

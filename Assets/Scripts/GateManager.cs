@@ -54,7 +54,7 @@ public class GateManager : UdonSharpBehaviour
     public override void OnPlayerTriggerExit(VRCPlayerApi player)
     {
         if (!AllGatesClosed()) {
-            if (player.isLocal && gameManager.localPlayerType == LocalPlayerType.INNOCENT_CAPTURED) {
+            if (player.isLocal && gameManager.players.Contains(player.playerId) && gameManager.localPlayerType != LocalPlayerType.HUNTER) {
                 gameManager.localPlayerType = LocalPlayerType.INNOCENT_FREE;
             }
             if (containedPlayers.Contains(player.playerId)) {

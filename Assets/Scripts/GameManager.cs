@@ -343,7 +343,7 @@ public class GameManager : UdonSharpBehaviour
         
         Debug.LogFormat("{0}: EndGameMaster", name);
         foreach (HunterItems items in hunterItems) {
-            items.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "DeactivateItems");
+            items.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DeactivateItems");
         }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SendPlayerHome");
         bubblePool.RemoveBubbles();

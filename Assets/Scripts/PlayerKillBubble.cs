@@ -11,6 +11,7 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public Collider bubbleCollider = null;
     public Transform gBJLocation = null;
     public PlayRandomSound soundFX = null;
+    public PlayRandomSound screamFX = null;
     public BubblePool bubblePool = null;
     public float interactProximity = 5f;
     public GateManager gateManager;
@@ -53,6 +54,7 @@ public class PlayerKillBubble : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.Owner, "PlayCapture");
             gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
             PlayCaptureSound();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayScream");
         }
     }
 
@@ -83,6 +85,12 @@ public class PlayerKillBubble : UdonSharpBehaviour
 
     public void PlayCaptureEffect() {
 
+    }
+
+    public void PlayScream() {
+        if (!Networking.GetOwner(gameObject).isLocal && (gameManager.localPlayerType == LocalPlayerType.INNOCENT_FREE || gameManager.localPlayerType == LocalPlayerType.NON_PARTICIPANT)) {
+            screamFX.Play();
+        }
     }
 
     public void PlayCaptureSound() {
