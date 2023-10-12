@@ -45,6 +45,7 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public void Deactivate() {
         bubbleActive = false;
         bubbleCollider.enabled = false;
+        _usingPlayer = null;
         Debug.LogFormat("{0}: Deactivated.", name);
     }
 
@@ -59,21 +60,26 @@ public class PlayerKillBubble : UdonSharpBehaviour
     }
 
     void Update() {
-        if (_usingPlayer != null) {
-            transform.position = _usingPlayer.GetPosition();
-            if (bubbleActive && gameManager.localPlayerType == LocalPlayerType.HUNTER) {
-                if (!gateManager.containedPlayers.Contains(Networking.GetOwner(gameObject).playerId) && Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
-                    bubbleCollider.enabled = true;
-                }
-                else {
-                    bubbleCollider.enabled = false;
+        if (gameManager.gameInProgress) {
+            if (_usingPlayer != null) {
+                transform.position = _usingPlayer.GetPosition();
+                if (bubbleActive && gameManager.localPlayerType == LocalPlayerType.HUNTER) {
+                    if (!gateManager.containedPlayers.Contains(Networking.GetOwner(gameObject).playerId) && Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
+                        bubbleCollider.enabled = true;
+                    }
+                    else {
+                        bubbleCollider.enabled = false;
+                    }
                 }
             }
+            else {
+                _usingPlayer = Networking.GetOwner(gameObject);
+                Debug.LogFormat("{0}: Caught empty _usingPlayer in update, filling with owner: {1}[{2}]", name, _usingPlayer.displayName, _usingPlayer.playerId);
+                OnOwnershipTransferred(_usingPlayer);
+            }
         }
-        else {
-            _usingPlayer = Networking.GetOwner(gameObject);
-            Debug.LogFormat("{0}: Caught empty _usingPlayer in update, filling with owner: {1}[{2}]", name, _usingPlayer.displayName, _usingPlayer.playerId);
-            OnOwnershipTransferred(_usingPlayer);
+        else if (_usingPlayer != null) {
+            Deactivate();
         }
     }
 

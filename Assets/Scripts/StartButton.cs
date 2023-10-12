@@ -55,6 +55,9 @@ public class StartButton : UdonSharpBehaviour
             }
             timerText.text = string.Format("Starting in... {0}", (int) startTimer);
         }
+        else if (gameManager.gameInProgress) {
+            timerText.text = "Game in progress...";
+        }
         else {
             timerText.text = "";
         }

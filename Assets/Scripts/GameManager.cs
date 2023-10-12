@@ -6,7 +6,6 @@ using VRC.SDKBase;
 using VRC.Udon;
 using VRC.SDK3.Data;
 using VRC.SDK3.Components;
-using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 
 
 public enum LocalPlayerType {
@@ -188,6 +187,7 @@ public class GameManager : UdonSharpBehaviour
         bubblePool.RemoveBubbles();
         RandomizeHunters();
         AssignBubbles();
+        nFlashlights = players.Count - nHunters;
         SpawnFlashlights();
         
         bubblePool.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ActiveEgg");

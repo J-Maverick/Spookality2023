@@ -265,6 +265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8900942570280039165}
   - component: {fileID: 1661807179461696441}
+  - component: {fileID: 5689279059887163819}
   - component: {fileID: 9156600191178683417}
   - component: {fileID: 6946727407318248434}
   - component: {fileID: 7020467077996814292}
@@ -306,6 +307,19 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!135 &5689279059887163819
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6528225700388433371}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!114 &9156600191178683417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,7 +346,7 @@ MonoBehaviour:
       Data: 
   _udonSharpBackingUdonBehaviour: {fileID: 6946727407318248434}
   bubbleActive: 0
-  bubbleCollider: {fileID: 1661807179461696441}
+  bubbleCollider: {fileID: 5689279059887163819}
   gBJLocation: {fileID: 0}
   soundFX: {fileID: 6392619050704959223}
   screamFX: {fileID: 8423068965519581365}
