@@ -9,6 +9,7 @@ public class HunterItems : UdonSharpBehaviour
     public LightsOnHead headLight;
     public SmokeBody smokeBody;
     public bool hunterAssigned = false;
+    public Animator animator;
 
     public void AssignHunter(VRCPlayerApi player) {
         Networking.SetOwner(player, gameObject);
@@ -30,5 +31,13 @@ public class HunterItems : UdonSharpBehaviour
         smokeBody.active = false;
         hunterAssigned = false;
         Debug.LogFormat("{0}: Deactivated", name);   
+    }
+
+    public void EnablePotato() {
+        animator.SetBool("Potato", true);
+    }
+
+    public void DisablePotato() {
+        animator.SetBool("Potato", false);
     }
 }
