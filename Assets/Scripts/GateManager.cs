@@ -50,6 +50,7 @@ public class GateManager : UdonSharpBehaviour
                 }
                 if (!containedPlayers.Contains(player.playerId)) {
                     containedPlayers.Add(player.playerId);
+                    Debug.LogFormat("{0}: player added to containment: {1}[{2}]", name, player.displayName, player.playerId);
                 }
             }
         }
@@ -68,6 +69,7 @@ public class GateManager : UdonSharpBehaviour
             }
             if (containedPlayers.Contains(player.playerId)) {
                 containedPlayers.Remove(player.playerId);
+                Debug.LogFormat("{0}: player removed from containment: {1}[{2}]", name, player.displayName, player.playerId);
             }
         }
         else if (gameManager.gameInProgress) {
@@ -106,6 +108,7 @@ public class GateManager : UdonSharpBehaviour
             }
             if (!AllGatesClosed() && containedPlayers.Count > 0) {
                 containedPlayers.Clear();
+                Debug.LogFormat("{0}: Cleared containment list", name);
             }
         }
         if (timer > 0f) {

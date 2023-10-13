@@ -184,26 +184,13 @@ public class GameManager : UdonSharpBehaviour
     public void MasterStart() {
         
         Debug.LogFormat("{0}: MasterStart", name);
-        bubblePool.RemoveBubbles();
         RandomizeHunters();
-        AssignBubbles();
         nFlashlights = players.Count - nHunters;
         SpawnFlashlights();
         
         bubblePool.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ActiveEgg");
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SpawnPlayers");
         gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
-    }
-
-    public void AssignBubbles() {
-        for (int i=0; i < players.Count; i++) {
-            if (!hunters.Contains(players[i])) {
-                bubblePool.AssignBubble(VRCPlayerApi.GetPlayerById(players[i].Int));
-            }
-            else {
-                hunterItems[hunters.IndexOf(players[i])].AssignHunter(VRCPlayerApi.GetPlayerById(players[i].Int));
-            }
-        }
     }
 
     public void RandomizeHunters() {
@@ -222,6 +209,7 @@ public class GameManager : UdonSharpBehaviour
                 }
             }
             hunters.Add(randPlayer);
+            hunterItems[h].AssignHunter(VRCPlayerApi.GetPlayerById(randPlayer));
         }
         RequestSerialization();
     }
@@ -302,6 +290,7 @@ public class GameManager : UdonSharpBehaviour
                 items.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ActivateItems");
             }
         }
+        bubblePool.ActivateBubbles();
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SpawnHunters");
     }
 
@@ -348,7 +337,8 @@ public class GameManager : UdonSharpBehaviour
             items.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DeactivateItems");
         }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SendPlayerHome");
-        bubblePool.RemoveBubbles();
+        bubblePool.DeactivateBubbles();
+        bubblePool.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "InactiveEgg");
         RequestSerialization();
     }
 

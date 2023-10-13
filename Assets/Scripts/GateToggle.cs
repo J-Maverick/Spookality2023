@@ -69,7 +69,6 @@ public class GateToggle : UdonSharpBehaviour
     public void FixedUpdate() {
         if (open) {
             if (!fullyOpen) {
-                Debug.LogFormat("{0}: FixedUpdate: opening", name);
                 transform.localRotation = Quaternion.RotateTowards(transform.localRotation, openRotation, _openRate * Time.fixedDeltaTime);
                 _openRate += _openRate * openRateMultiplier * Time.fixedDeltaTime;
                 if (transform.localRotation == openRotation) {
@@ -79,7 +78,6 @@ public class GateToggle : UdonSharpBehaviour
         }
         else {
             if (!fullyClosed) {
-                Debug.LogFormat("{0}: FixedUpdate: closing", name);
                 transform.localRotation = Quaternion.RotateTowards(transform.localRotation, closeRotation, closeRate * Time.fixedDeltaTime);
                 if (transform.localRotation == closeRotation) {
                     fullyClosed = true;

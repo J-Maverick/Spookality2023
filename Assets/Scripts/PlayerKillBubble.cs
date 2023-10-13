@@ -13,39 +13,62 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public PlayRandomSound soundFX = null;
     public PlayRandomSound screamFX = null;
     public BubblePool bubblePool = null;
-    public float interactProximity = 5f;
     public GateManager gateManager;
     public GameManager gameManager;
 
+    public void Start() {
+        _usingPlayer = Networking.GetOwner(gameObject);
+    }
+
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Activate");
+        _usingPlayer = player;
     }
 
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if (player.isLocal) {
             _usingPlayer = Networking.GetOwner(gameObject);
-            Activate();
+        }
+    }
+
+
+    public override void OnPlayerLeft(VRCPlayerApi player)
+    {
+        if (player != null && player == _usingPlayer) {
+            _usingPlayer = null;
+            Deactivate();
+            bubblePool.RemoveBubble(gameObject);
         }
     }
 
     public void Activate() {
         _usingPlayer = Networking.GetOwner(gameObject);
-        bubbleActive = true;
-        if (gameManager.localPlayerType == LocalPlayerType.HUNTER) {
-            bubbleCollider.enabled = true;
+        if (gameManager.players.Contains(_usingPlayer.playerId)) {
+            if (!gameManager.hunters.Contains(_usingPlayer.playerId)) {
+                bubbleActive = true;
+                if (gameManager.localPlayerType == LocalPlayerType.HUNTER) {
+                    bubbleCollider.enabled = true;
+                }
+                else {
+                    bubbleCollider.enabled = false;
+                }
+            }
+            else {
+                bubbleActive = false;
+                bubbleCollider.enabled = false;
+            }
         }
         else {
+            bubbleActive = false;
             bubbleCollider.enabled = false;
         }
-        Debug.LogFormat("{0}: Initialized | _usingPlayer: {1}[{2}] | localPlayerType: {3} | Collider: {4}", name, _usingPlayer.displayName, _usingPlayer.playerId, gameManager.localPlayerType.ToString(), bubbleCollider.enabled);
+        Debug.LogFormat("{0}: Activated | _usingPlayer: {1}[{2}] | localPlayerType: {3} | Collider: {4}", name, _usingPlayer.displayName, _usingPlayer.playerId, gameManager.localPlayerType.ToString(), bubbleCollider.enabled);
     }
 
     public void Deactivate() {
         bubbleActive = false;
         bubbleCollider.enabled = false;
-        _usingPlayer = null;
         Debug.LogFormat("{0}: Deactivated.", name);
     }
 
@@ -61,28 +84,20 @@ public class PlayerKillBubble : UdonSharpBehaviour
 
     void Update() {
         if (gameManager.gameInProgress) {
-            if (_usingPlayer != null) {
-                transform.position = _usingPlayer.GetPosition();
-                if (bubbleActive && gameManager.localPlayerType == LocalPlayerType.HUNTER) {
-                    if (!gateManager.containedPlayers.Contains(Networking.GetOwner(gameObject).playerId) && Vector3.Distance(transform.position, Networking.LocalPlayer.GetPosition()) < interactProximity) {
-                        bubbleCollider.enabled = true;
-                    }
-                    else {
-                        bubbleCollider.enabled = false;
-                    }
-                }
-            }
-            else {
-                _usingPlayer = Networking.GetOwner(gameObject);
-                Debug.LogFormat("{0}: Caught empty _usingPlayer in update, filling with owner: {1}[{2}]", name, _usingPlayer.displayName, _usingPlayer.playerId);
-                OnOwnershipTransferred(_usingPlayer);
-            }
+            transform.position = _usingPlayer.GetPosition();
         }
-        else if (_usingPlayer != null) {
-            Deactivate();
+        else if (bubbleActive) {
+            Debug.LogFormat("{0}: This would have disabled the bubble!", name);
+            // Deactivate();
         }
     }
 
+    public void LogInfrequent(string log) {
+        if (Time.frameCount % 500 == 0) {
+            Debug.Log(log);
+        }
+    }
+    
     public void PlayCapture() {
         _usingPlayer.TeleportTo(gBJLocation.position, gBJLocation.rotation);
         PlayCaptureEffect();
@@ -103,22 +118,8 @@ public class PlayerKillBubble : UdonSharpBehaviour
         soundFX.Play();
     }
 
-    public override void OnPlayerLeft(VRCPlayerApi player)
-    {
-        if (player != null && player == _usingPlayer) {
-            _usingPlayer = null;
-            bubblePool.RemoveBubble(gameObject);
-        }
-    }
-
     public void TransferOwner(VRCPlayerApi player) {
         _usingPlayer = player;
-        if (player.isLocal) {  
-            OnOwnershipTransferred(player);
-        }
-        else {
-            Networking.SetOwner(_usingPlayer, gameObject);
-        }
+        Networking.SetOwner(_usingPlayer, gameObject);
     }
-
 }

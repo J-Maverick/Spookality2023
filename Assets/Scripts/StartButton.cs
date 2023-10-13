@@ -6,12 +6,13 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class StartButton : UdonSharpBehaviour
 {
 
     public float startTime = 5f;
     public float startTimer = 5f;
-    [UdonSynced] public bool starting = false;
+    public bool starting = false;
     [UdonSynced] public bool masterOnly = true;
     public GameManager gameManager;
     public Text timerText;
