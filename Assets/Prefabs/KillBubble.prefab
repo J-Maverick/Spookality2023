@@ -440,6 +440,9 @@ MonoBehaviour:
     - Name: _usingPlayer
       Entry: 6
       Data: 
+    - Name: Owner
+      Entry: 6
+      Data: 
   _udonSharpBackingUdonBehaviour: {fileID: 6946727407318248434}
   bubbleActive: 0
   bubbleCollider: {fileID: 5689279059887163819}

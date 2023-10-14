@@ -30,7 +30,25 @@ public class GameManager : UdonSharpBehaviour
     public WorkLights workLights;
     public GateManager gateManager;
 
-    [UdonSynced] public bool gameInProgress = false;
+    [UdonSynced, FieldChangeCallback(nameof(gameInProgress))]
+    private bool _gameInProgress;
+
+    public bool gameInProgress
+    {
+        set
+        {
+            bool startUp = !_gameInProgress && value;
+            _gameInProgress = value;
+            if (startUp && Networking.LocalPlayer.isMaster) {
+                StartGame();
+            }
+            else if (startUp) {
+                SendCustomEventDelayedFrames("StartGame", 1);
+            }
+            Debug.LogFormat("{0}: Setting gameInProgress: {1}", _gameInProgress);
+        }
+        get => _gameInProgress;
+    }
     [UdonSynced] public bool hidingPhase = false;
     [UdonSynced] public int gameLengthMin = 5;
     [UdonSynced] public int hidingTimeSecs = 45;
@@ -69,13 +87,13 @@ public class GameManager : UdonSharpBehaviour
         {
             Debug.LogError(result.ToString());
         }
-        if (VRCJson.TrySerializeToJson(hunters, JsonExportType.Minify, out result))
+        if (VRCJson.TrySerializeToJson(hunters, JsonExportType.Minify, out DataToken result2))
         {
-            hunters_json = result.String;
+            hunters_json = result2.String;
         }
         else
         {
-            Debug.LogError(result.ToString());
+            Debug.LogError(result2.ToString());
         }
     }
 
@@ -92,17 +110,18 @@ public class GameManager : UdonSharpBehaviour
         {
             Debug.LogError(result.ToString());
         }
-        if(VRCJson.TryDeserializeFromJson(hunters_json, out result))
+        if(VRCJson.TryDeserializeFromJson(hunters_json, out DataToken result2))
         {
-            hunters = result.DataList;
+            hunters = result2.DataList;
             for (int i=0; i < hunters.Count; i++) {
                 hunters[i] = (int) hunters[i].Double;
             }
         }
         else
         {
-            Debug.LogError(result.ToString());
+            Debug.LogError(result2.ToString());
         }
+        Debug.LogFormat("{0}: OnDeserialization", name);
     }
 
     public override void OnAvatarChanged(VRCPlayerApi player)
@@ -171,7 +190,6 @@ public class GameManager : UdonSharpBehaviour
         }
         gameTime = gameLengthMin * 60f;
         hidingTime = hidingTimeSecs;
-        gameInProgress = true;
         hidingPhase = true;
         ambience.rampTime = hidingTime;
         ambience.Play();
@@ -179,21 +197,22 @@ public class GameManager : UdonSharpBehaviour
             MasterStart();
         }
         victorySplash.text = "";
+        bubblePool.ActiveEgg();
+        SpawnPlayers();
     }
 
     public void MasterStart() {
-        
         Debug.LogFormat("{0}: MasterStart", name);
         RandomizeHunters();
         nFlashlights = players.Count - nHunters;
         SpawnFlashlights();
+        RequestSerialization();
         
-        bubblePool.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ActiveEgg");
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SpawnPlayers");
         gateManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ShutAllGates");
     }
 
     public void RandomizeHunters() {
+        Debug.LogFormat("{0}: RandomizeHunters", name);
         hunters.Clear();
         int iterLimit = 100;
         for (int h=0;  h < nHunters; h++) {
@@ -211,10 +230,14 @@ public class GameManager : UdonSharpBehaviour
             hunters.Add(randPlayer);
             hunterItems[h].AssignHunter(VRCPlayerApi.GetPlayerById(randPlayer));
         }
-        RequestSerialization();
     }
 
     public void SpawnPlayers() {
+        Debug.LogFormat("{0}: SpawnPlayers", name);
+        // if (!gameInProgress) {
+        //     Debug.LogFormat("{0}: Tried to spawn while game not in progress, initializing backup start", name);
+        //     StartGame();
+        // }
         int localPlayerId = Networking.LocalPlayer.playerId;
         playerStartHeight = Networking.LocalPlayer.GetAvatarEyeHeightAsMeters();
         if (players.Contains(localPlayerId)) {
@@ -240,9 +263,11 @@ public class GameManager : UdonSharpBehaviour
             Networking.LocalPlayer.SetManualAvatarScalingAllowed(true);
             playerStats.SetDefaultSpeed();
         }
+        Debug.LogFormat("{0}: Spawned Player. gameInProgress: {1} | localPlayerType: {2}", name, gameInProgress, localPlayerType.ToString());
     }
 
     public void ResetFlashlights() {
+        Debug.LogFormat("{0}: ResetFlashlights", name);
         foreach (Torch flashlight in flashlights) {
             flashlight.Disable();
             Networking.SetOwner(Networking.GetOwner(gameObject), flashlight.gameObject);
@@ -251,6 +276,7 @@ public class GameManager : UdonSharpBehaviour
 
     [ContextMenu("Spawn Flashlights")]
     public void SpawnFlashlights() {
+        Debug.LogFormat("{0}: SpawnFlashlights", name);
         ResetFlashlights();
         if (nFlashlights > 0) {
             defaultFlashlight.Enable();
@@ -273,7 +299,6 @@ public class GameManager : UdonSharpBehaviour
     }
 
     public void EndHidingTime() {
-        
         Debug.LogFormat("{0}: EndHidingTime", name);
         hidingPhase = false;
         workLights.LightsOff();
@@ -281,6 +306,8 @@ public class GameManager : UdonSharpBehaviour
         if (Networking.LocalPlayer.isMaster) {
             EndHidingTimeMaster();
         }
+        
+        bubblePool.ActivateBubbles();
     }
 
     public void EndHidingTimeMaster() {
@@ -290,7 +317,7 @@ public class GameManager : UdonSharpBehaviour
                 items.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ActivateItems");
             }
         }
-        bubblePool.ActivateBubbles();
+        // bubblePool.ActivateBubbles();
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SpawnHunters");
     }
 
@@ -299,6 +326,7 @@ public class GameManager : UdonSharpBehaviour
     }
 
     public void SpawnHunters() {
+        Debug.LogFormat("{0}: SpawnHunters", name);
         if (hunters.Contains(Networking.LocalPlayer.playerId)) {
             SendCustomEventDelayedSeconds("DelayHunterSpawn", 2f);
         }
@@ -328,6 +356,7 @@ public class GameManager : UdonSharpBehaviour
         ClearPlayers();
         SendCustomEventDelayedSeconds("ClearPlayers", 3f);
         ResetFlashlights();
+        RequestSerialization();
     }
 
     public void EndGameMaster() {
@@ -339,7 +368,6 @@ public class GameManager : UdonSharpBehaviour
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SendPlayerHome");
         bubblePool.DeactivateBubbles();
         bubblePool.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "InactiveEgg");
-        RequestSerialization();
     }
 
     public override void OnPlayerRespawn(VRCPlayerApi player)
@@ -363,7 +391,6 @@ public class GameManager : UdonSharpBehaviour
     }
 
     public void Update() {
-        
         if (gameInProgress && !hidingPhase) {
             gameTime -= Time.deltaTime;
             if (gameTime <= 0f) {

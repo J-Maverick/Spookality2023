@@ -51,7 +51,8 @@ public class StartButton : UdonSharpBehaviour
             if (startTimer <= 0f) {
                 starting = false;
                 if (Networking.GetOwner(gameManager.gameObject).isLocal && gameManager.players.Count > gameManager.nHunters) {
-                    gameManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "StartGame");
+                    gameManager.gameInProgress = true;
+                    // gameManager.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "StartGame");
                 }
             }
             timerText.text = string.Format("Starting in... {0}", (int) startTimer);

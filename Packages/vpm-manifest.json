@@ -17,6 +17,9 @@
     },
     "dev.onevr.vrworldtoolkit": {
       "version": "2.1.5"
+    },
+    "com.cyan.playerobjectpool": {
+      "version": "1.1.2"
     }
   },
   "locked": {
@@ -50,6 +53,13 @@
       "version": "2.1.5",
       "dependencies": {
         "com.vrchat.base": "^3.2.x"
+      }
+    },
+    "com.cyan.playerobjectpool": {
+      "version": "1.1.2",
+      "dependencies": {
+        "com.vrchat.worlds": "^3.1.x",
+        "com.vrchat.udonsharp": "^1.1.x"
       }
     }
   }

@@ -7,6 +7,7 @@ using VRC.Udon;
 public class PlayerKillBubble : UdonSharpBehaviour
 {
     public VRCPlayerApi _usingPlayer = null;
+    public VRCPlayerApi Owner;
     public bool bubbleActive = false;
     public Collider bubbleCollider = null;
     public Transform gBJLocation = null;
@@ -16,34 +17,45 @@ public class PlayerKillBubble : UdonSharpBehaviour
     public GateManager gateManager;
     public GameManager gameManager;
 
-    public void Start() {
-        _usingPlayer = Networking.GetOwner(gameObject);
+    // public void Start() {
+    //     _usingPlayer = Networking.GetOwner(gameObject);
+    // }
+
+    // public override void OnOwnershipTransferred(VRCPlayerApi player)
+    // {
+    //     _usingPlayer = player;
+    // }
+
+    // public override void OnPlayerJoined(VRCPlayerApi player)
+    // {
+    //     if (player.isLocal) {
+    //         _usingPlayer = Networking.GetOwner(gameObject);
+    //     }
+    // }
+
+    // public override void OnPlayerLeft(VRCPlayerApi player)
+    // {
+    //     if (player != null && player == _usingPlayer) {
+    //         _usingPlayer = null;
+    //         Deactivate();
+    //         bubblePool.RemoveBubble(gameObject);
+    //     }
+    // }
+
+    public void _OnOwnerSet() {
+        _usingPlayer = Owner;
     }
 
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
-    {
-        _usingPlayer = player;
-    }
-
-    public override void OnPlayerJoined(VRCPlayerApi player)
-    {
-        if (player.isLocal) {
-            _usingPlayer = Networking.GetOwner(gameObject);
-        }
-    }
-
-
-    public override void OnPlayerLeft(VRCPlayerApi player)
-    {
-        if (player != null && player == _usingPlayer) {
-            _usingPlayer = null;
-            Deactivate();
-            bubblePool.RemoveBubble(gameObject);
-        }
+    public void _OnCleanup() {
+        _usingPlayer = null;
+        Deactivate();
     }
 
     public void Activate() {
-        _usingPlayer = Networking.GetOwner(gameObject);
+        if (_usingPlayer == null || !_usingPlayer.isLocal) {
+            _usingPlayer = Networking.GetOwner(gameObject);
+        }
+
         if (gameManager.players.Contains(_usingPlayer.playerId)) {
             if (!gameManager.hunters.Contains(_usingPlayer.playerId)) {
                 bubbleActive = true;
@@ -63,7 +75,7 @@ public class PlayerKillBubble : UdonSharpBehaviour
             bubbleActive = false;
             bubbleCollider.enabled = false;
         }
-        Debug.LogFormat("{0}: Activated | _usingPlayer: {1}[{2}] | localPlayerType: {3} | Collider: {4}", name, _usingPlayer.displayName, _usingPlayer.playerId, gameManager.localPlayerType.ToString(), bubbleCollider.enabled);
+        Debug.LogFormat("{0}: Activated | _usingPlayer: {1}[{2}] | localPlayerType: {3} | Collider: {4} | bubbleActive: {5} | gameInProgress: {6}", name, _usingPlayer.displayName, _usingPlayer.playerId, gameManager.localPlayerType.ToString(), bubbleCollider.enabled, bubbleActive, gameManager.gameInProgress);
     }
 
     public void Deactivate() {
@@ -85,10 +97,13 @@ public class PlayerKillBubble : UdonSharpBehaviour
     void Update() {
         if (gameManager.gameInProgress) {
             transform.position = _usingPlayer.GetPosition();
+            if (!bubbleActive && !gameManager.hunters.Contains(_usingPlayer.playerId)) {
+                Activate();
+            }
         }
         else if (bubbleActive) {
-            Debug.LogFormat("{0}: This would have disabled the bubble!", name);
-            // Deactivate();
+            // Debug.LogFormat("{0}: This would have disabled the bubble!", name);
+            Deactivate();
         }
     }
 
@@ -120,6 +135,12 @@ public class PlayerKillBubble : UdonSharpBehaviour
 
     public void TransferOwner(VRCPlayerApi player) {
         _usingPlayer = player;
+        Networking.SetOwner(_usingPlayer, gameObject);
+        SendCustomEventDelayedSeconds("DelayOwnershipTransfer", 5f);
+        SendCustomEventDelayedSeconds("DelayOwnershipTransfer", 10f);
+    }
+
+    public void DelayOwnershipTransfer() {
         Networking.SetOwner(_usingPlayer, gameObject);
     }
 }
