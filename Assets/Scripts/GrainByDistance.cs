@@ -16,9 +16,11 @@ public class GrainByDistance : UdonSharpBehaviour
             distance = maxDistance;
             Vector3 localPlayerPosition = Networking.LocalPlayer.GetPosition();
             for (int i=0; i<gameManager.hunters.Count; i++) {
-                float distBetween = Vector3.Distance(VRCPlayerApi.GetPlayerById(gameManager.hunters[i].Int).GetPosition(), localPlayerPosition);
-                if (distBetween < distance) {
-                    distance = distBetween;
+                if (VRCPlayerApi.GetPlayerById(gameManager.hunters[i].Int).IsValid()) {
+                    float distBetween = Vector3.Distance(VRCPlayerApi.GetPlayerById(gameManager.hunters[i].Int).GetPosition(), localPlayerPosition);
+                    if (distBetween < distance) {
+                        distance = distBetween;
+                    }
                 }
             }
             animator.SetFloat("Grain", 1f - (distance / maxDistance));

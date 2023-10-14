@@ -12,6 +12,31 @@ public class GateManager : UdonSharpBehaviour
     public GameManager gameManager;
     public DataList containedPlayers = new DataList(){};
     public float timer = 0f;
+    
+    [UdonSynced, FieldChangeCallback(nameof(fastMode))]
+    private bool _fastMode = false;
+    public bool fastMode
+    {
+        set
+        {
+            _fastMode = value;
+            if (_fastMode) {
+                foreach (GateToggle gate in gates) {
+                    gate.openRate = gate.openRateFast;
+                    gate.openRateMultiplier = gate.openRateMultiplierFast;
+                    gate.openSound = gate.openSoundFast;
+                }
+            }
+            else {
+                foreach (GateToggle gate in gates) {
+                    gate.openRate = gate.openRateSlow;
+                    gate.openRateMultiplier = gate.openRateMultiplierSlow;
+                    gate.openSound = gate.openSoundSlow;
+                }
+            }
+        }
+        get => _fastMode;
+    }
 
     public void ShutAllGates() {
         foreach (GateToggle gate in gates) {
