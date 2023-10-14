@@ -197,7 +197,6 @@ public class GameManager : UdonSharpBehaviour
             MasterStart();
         }
         victorySplash.text = "";
-        bubblePool.ActiveEgg();
         SpawnPlayers();
     }
 
@@ -248,6 +247,7 @@ public class GameManager : UdonSharpBehaviour
                 Networking.LocalPlayer.TeleportTo(hunterSpawn.position, hunterSpawn.rotation);
                 hunterKeepawayZone.SetActive(true);
                 playerStats.SetBigSpeed();
+                bubblePool.ActiveEgg();
             }
             else {
                 localPlayerType = LocalPlayerType.INNOCENT_FREE;
@@ -256,6 +256,7 @@ public class GameManager : UdonSharpBehaviour
                 Networking.LocalPlayer.TeleportTo(huntedSpawn.position, huntedSpawn.rotation);
                 hunterKeepawayZone.SetActive(false);
                 playerStats.SetSmallSpeed();
+                bubblePool.ActiveEgg();
             }
         }
         else {  

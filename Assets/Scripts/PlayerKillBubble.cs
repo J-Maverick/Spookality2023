@@ -95,9 +95,9 @@ public class PlayerKillBubble : UdonSharpBehaviour
     }
 
     void Update() {
-        if (gameManager.gameInProgress) {
+        if (gameManager.gameInProgress && _usingPlayer != null && _usingPlayer.IsValid()) {
             transform.position = _usingPlayer.GetPosition();
-            if (!bubbleActive && !gameManager.hunters.Contains(_usingPlayer.playerId)) {
+            if (!bubbleActive && gameManager.players.Contains(_usingPlayer.playerId) && !gameManager.hunters.Contains(_usingPlayer.playerId)) {
                 Activate();
             }
         }
