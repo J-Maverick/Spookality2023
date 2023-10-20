@@ -152,7 +152,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6949065764802348959
 Transform:
   m_ObjectHideFlags: 0
@@ -449,6 +449,7 @@ MonoBehaviour:
   pickup: {fileID: 6949065764987057122}
   gameManager: {fileID: 0}
   animator: {fileID: 4518319932898498092}
+  quest: 0
 --- !u!95 &4518319932898498092
 Animator:
   serializedVersion: 3

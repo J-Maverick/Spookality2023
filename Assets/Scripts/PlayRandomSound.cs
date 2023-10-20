@@ -10,7 +10,9 @@ public class PlayRandomSound : UdonSharpBehaviour
     public AudioSource audioSource = null;
 
     public void Play() {
-        audioSource.clip = clips[Random.Range(0, clips.Length)];
-        audioSource.Play();
+        if (!audioSource.isPlaying) {
+            audioSource.clip = clips[Random.Range(0, clips.Length)];
+            audioSource.Play();
+        }
     }
 }

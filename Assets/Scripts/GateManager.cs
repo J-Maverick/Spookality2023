@@ -14,7 +14,7 @@ public class GateManager : UdonSharpBehaviour
     public float timer = 0f;
     
     [UdonSynced, FieldChangeCallback(nameof(fastMode))]
-    private bool _fastMode = false;
+    private bool _fastMode = true;
     public bool fastMode
     {
         set
@@ -38,10 +38,19 @@ public class GateManager : UdonSharpBehaviour
         get => _fastMode;
     }
 
+    public bool gbjEscapeCheck = false;
+
     public void ShutAllGates() {
+        if (!AllGatesClosed() && gameManager.localPlayerType == LocalPlayerType.HUNTER) {
+            SendCustomEventDelayedSeconds("ClearContainedPlayers", 2f);
+        }
         foreach (GateToggle gate in gates) {
             gate.Close();
         }
+    }
+
+    public void ClearContainedPlayers() {
+        containedPlayers.Clear();
     }
 
     public bool CanOpenNew()
@@ -78,6 +87,7 @@ public class GateManager : UdonSharpBehaviour
                     Debug.LogFormat("{0}: player added to containment: {1}[{2}]", name, player.displayName, player.playerId);
                 }
             }
+            gbjEscapeCheck = false;
         }
         else {
             if (player.isLocal) {
@@ -100,7 +110,16 @@ public class GateManager : UdonSharpBehaviour
         else if (gameManager.gameInProgress) {
             if (player.isLocal && gameManager.localPlayerType == LocalPlayerType.INNOCENT_CAPTURED) {
                 player.TeleportTo(transform.position, transform.rotation);
+                SendCustomEventDelayedSeconds("GBJEscapeGatherer", 2f);
             }
+        }
+        gbjEscapeCheck = true;
+    }
+
+    public void GBJEscapeGatherer() {
+        if (gbjEscapeCheck && containedPlayers.Contains(Networking.LocalPlayer.playerId) && gameManager.localPlayerType != LocalPlayerType.HUNTER) {
+            Networking.LocalPlayer.TeleportTo(transform.position, transform.rotation);
+            SendCustomEventDelayedSeconds("GBJEscapeGatherer", 2f);
         }
     }
 

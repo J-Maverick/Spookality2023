@@ -121,7 +121,17 @@ public class GameManager : UdonSharpBehaviour
         {
             Debug.LogError(result2.ToString());
         }
+        UpdateText();
         Debug.LogFormat("{0}: OnDeserialization", name);
+    }
+
+    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    {
+        if (player.isLocal && hidingPhase) {
+            for (int h = 0; h < hunters.Count; h++) {
+                hunterItems[h].AssignHunter(VRCPlayerApi.GetPlayerById(hunters[h].Int));
+            }
+        }
     }
 
     public override void OnAvatarChanged(VRCPlayerApi player)
